@@ -9,6 +9,15 @@ ROUTE_CACHE = {}
 DB_PATH = "db/proxy.db"
 SQL_FILE = "db/schema.sql"
 logger = logging.getLogger("proxy")
+logger.setLevel(logging.DEBUG)  
+
+console_handler = logging.StreamHandler()
+console_handler.setLevel(logging.DEBUG)  
+
+formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
+console_handler.setFormatter(formatter)
+
+logger.addHandler(console_handler)
 
 def load_routes(): 
     global ROUTE_CACHE
@@ -36,18 +45,18 @@ def start_cache_updater(interval=30):
     t.start()
 
 def get_target_from_cache(hostname):
-    return ROUTE_CACHE.get(hostname)
+    return ROUTE_CACHE.get(hostname.rstrip('.'))
 
     
 def get_target_from_db(hostname):
     try:
         with sqlite3.connect(DB_PATH) as conn:
             cur = conn.cursor()
-            cur.execute("SELECT target_ip, target_port FROM routes WHERE hostname = ?", (hostname,))
+            cur.execute("SELECT target_ip, target_port FROM routes WHERE hostname = ?", (hostname.rstrip('.'),))
             res = cur.fetchone()
             if res:
                 ip, port = res
-                ROUTE_CACHE[hostname] = (ip, port)
+                ROUTE_CACHE[hostname.rstrip('.')] = (ip, port)
                 return (ip, port)
     except Exception as e:
         logger.error(f"Error fetching from DB:", e)
@@ -102,7 +111,7 @@ def parse_handshake(client_sock):
 
     protocol_version = read_varint_from_data()
     hostname_length = read_varint_from_data()
-    hostname = data[i:i+hostname_length].decode()
+    hostname = data[i:i+hostname_length].decode().rstrip('.') 
     i += hostname_length
     port = int.from_bytes(data[i:i+2], "big")
     i += 2
