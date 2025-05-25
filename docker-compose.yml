@@ -6,4 +6,6 @@ services:
       - "25565:25565"
       - "8000:8000"
     volumes:
-      - ./db:/app/db
+      - database:/app/db
+volumes:
+  database:

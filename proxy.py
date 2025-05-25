@@ -10,9 +10,9 @@ DB_PATH = "db/proxy.db"
 SQL_FILE = "db/schema.sql"
 logger = logging.getLogger("proxy")
 
-def load_routes():
-    old_len = len(ROUTE_CACHE)
+def load_routes(): 
     global ROUTE_CACHE
+    old_len = len(ROUTE_CACHE)
     try:
         with sqlite3.connect(DB_PATH) as conn:
             cur = conn.cursor()
