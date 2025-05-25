@@ -1,0 +1,6 @@
+CREATE TABLE IF NOT EXISTS routes (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    hostname TEXT UNIQUE NOT NULL,
+    target_ip TEXT NOT NULL,
+    target_port INTEGER NOT NULL
+);
